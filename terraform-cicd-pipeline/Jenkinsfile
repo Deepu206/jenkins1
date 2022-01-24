@@ -1,14 +1,16 @@
 pipeline {
-  agent  any
+    agent  any
+      triggers {
+        pollSCM "* * * * *"
+       } 	
     stages {
 
       stage ('Checkout SCM'){
         steps {
+          echo '=== Checking out code from Git ==='		
           git "url: 'https://github.com/Deepu206/terraform1.git"
         }
       }
-
-     
       stage('Set Terraform path') {
        steps {
          script {
@@ -17,8 +19,10 @@ pipeline {
          }
      }
   }
-  stage('terraform init') {
- 
+     stage('terraform init') {
+       when {
+                branch 'main'
+       } 	  
        steps {
            dir ("vpc") {
                 script {
@@ -30,8 +34,10 @@ pipeline {
         }
       }
 
-  stage('terraform Plan') {
- 
+   stage('terraform Plan') {
+       when {
+           branch 'main'
+       } 	  
        steps {
            dir ("vpc") {
             
@@ -44,8 +50,10 @@ pipeline {
         }
       }
 
-  stage('Waiting for Approvals') {
-            
+  stage('Waiting for Approvals') {   
+     when {
+                branch 'main'
+       }	      
       steps{
           input('Plan Validated? Please approve to create VPC Network in AWS?')
 			  }
